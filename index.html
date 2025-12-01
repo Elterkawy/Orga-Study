@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrgaStudy - Organization and Study Tips</title>
+    <link rel="stylesheet" href="OrgaStudy.css">
+    <link rel="stylesheet" href="daily-scheduler.css">
+    <link rel="icon" href="CheckReminders.html">
+</head>
+<body>
+    <header>
+        <h1>OrgaStudy</h1>
+        <nav>
+            <ul>
+                <li><a href="#presentation">Accueil</a></li>
+                <li><a href="#devoires">Devoirs</a></li>
+                <li><a href="#calendrier">Calendrier</a></li>
+                <li><a href="#daily-scheduler">Planificateur</a></li>
+                <li><a href="#cours">Cours</a></li>
+                <li><a href="#tools">Outils</a></li>
+                <li><a href="#pomodoro">Pomodoro</a></li>
+                <li><a href="#goals">Objectifs</a></li>
+                <li><a href="#stats">Statistiques</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="presentation">
+            <h2>Bienvenue sur OrgaStudy</h2>
+            <p>Votre ressource ultime pour l'organisation et les conseils d'étude.</p>
+        </section>
+
+        <section id="devoires">
+            <h2>Mes Devoirs</h2>
+            <form id="devoires-form">
+                <label for="Sujet">Sujet:</label>
+                <input type="text" id="Sujet" name="Sujet" required>
+
+                <label for="date-limite">Date d'échéance:</label>
+                <input type="date" id="date-limite" name="date-limite" required>
+
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required></textarea>
+
+                <label for="urgence">Urgence (1 faible → 5 haute):</label>
+                <select id="urgence" name="urgence">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+
+                <label for="difficulte">Difficulté (1 facile → 5 difficile):</label>
+                <select id="difficulte" name="difficulte">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+
+                <label for="duree">Durée estimée (heures):</label>
+                <input type="number" id="duree" name="duree" min="0" step="0.5" value="1">
+
+                <button type="submit">Ajouter Devoir</button>
+            </form>
+            <div id="homework-list">
+                <h3>Liste des Devoirs</h3>
+                <ul></ul>
+            </div>
+        </section>
+
+        <section id="calendrier">
+            <h2>Calendrier</h2>
+            <div class="calendar-controls">
+                <button id="prev-month" aria-label="Mois précédent">&lt;</button>
+                <div id="month-label" aria-live="polite"></div>
+                <button id="next-month" aria-label="Mois suivant">&gt;</button>
+            </div>
+            <div id="calendar" class="calendar" role="grid"></div>
+            <div id="day-events" class="day-events"></div>
+        </section>
+
+        <section id="daily-scheduler" hidden>
+            <h2>Planificateur Journalier</h2>
+            <div id="daily-calendar"></div>
+            <div id="time-blocks"></div>
+        </section>
+
+        <section id="cours">
+            <h2>Cours</h2>
+            <form id="course-form">
+                <label for="course-title">Titre du cours :</label>
+                <input id="course-title" name="title" required>
+
+                <label for="course-content">Contenu (texte libre) :</label>
+                <textarea id="course-content" name="content" rows="8" placeholder="Écrivez vos cours ici..."></textarea>
+
+                <input type="hidden" id="course-id" value="">
+                <button type="submit">Enregistrer le cours</button>
+            </form>
+
+            <div id="course-list">
+                <h3>Mes cours</h3>
+                <ul></ul>
+            </div>
+
+            <div id="course-view" hidden>
+                <h3 id="view-title"></h3>
+                <div id="view-content"></div>
+                <div style="margin-top:8px">
+                    <button id="edit-course">Éditer</button>
+                    <button id="open-course-newtab">Ouvrir dans un nouvel onglet</button>
+                    <button id="delete-course">Supprimer</button>
+                    <button id="close-course-view">Fermer</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="tools">
+            <h2>Outils d'organisation</h2>
+
+            <!-- Chronomètre -->
+            <div id="timer" class="tool-box">
+                <h3>Chronomètre</h3>
+                <div>
+                    <span id="timer-display">00:00:00</span>
+                    <button id="start-timer">Démarrer</button>
+                    <button id="stop-timer">Arrêter</button>
+                    <button id="reset-timer">Réinitialiser</button>
+                </div>
+            </div>
+
+            <!-- Gestionnaire de Notes -->
+            <div id="notes-manager" class="tool-box">
+                <h3>Gestionnaire de Notes</h3>
+                <textarea id="notes" rows="5" placeholder="Écrivez vos notes ici..."></textarea>
+                <button id="save-notes">Sauvegarder les Notes</button>
+                <div id="saved-notes"></div>
+            </div>
+
+            <!-- Simulateur de Moyenne -->
+            <div id="average-simulator" class="tool-box">
+                <h3>Simulateur de Moyenne</h3>
+                <button id="generate-calendar">Calculer la Moyenne</button>
+            </div>
+
+            
+<!-- Calculatrice -->
+<div id="calculator" class="tool-box">
+    <h3>Calculatrice</h3>
+    <div class="calculator-container">
+        <div class="calc-display">
+            <input type="text" id="calc-input" placeholder="0" readonly />
+        </div>
+        <div class="calc-grid">
+            <button class="calc-btn calc-clear" data-value="C">C</button>
+            <button class="calc-btn calc-operator" data-value="/">/</button>
+            <button class="calc-btn calc-operator" data-value="*">×</button>
+            <button class="calc-btn calc-operator" data-value="-">−</button>
+            
+            <button class="calc-btn calc-number" data-value="7">7</button>
+            <button class="calc-btn calc-number" data-value="8">8</button>
+            <button class="calc-btn calc-number" data-value="9">9</button>
+            <button class="calc-btn calc-operator" data-value="+">+</button>
+            
+            <button class="calc-btn calc-number" data-value="4">4</button>
+            <button class="calc-btn calc-number" data-value="5">5</button>
+            <button class="calc-btn calc-number" data-value="6">6</button>
+            <button class="calc-btn calc-decimal" data-value=".">.</button>
+            
+            <button class="calc-btn calc-number" data-value="1">1</button>
+            <button class="calc-btn calc-number" data-value="2">2</button>
+            <button class="calc-btn calc-number" data-value="3">3</button>
+            <button class="calc-btn calc-equals" id="calc-equal" data-value="=">=</button>
+            
+            <button class="calc-btn calc-zero" data-value="0">0</button>
+        </div>
+    </div>
+</div>
+
+        <!-- Pomodoro Technique -->
+        <section id="pomodoro">
+            <h2>Technique Pomodoro</h2>
+            <div id="pomodoro-box" class="tool-box">
+                <div id="pomodoro-display">25:00</div>
+                <div style="display:flex;gap:10px;justify-content:center">
+                    <button id="pomodoro-start">Démarrer</button>
+                    <button id="pomodoro-pause">Pause</button>
+                    <button id="pomodoro-reset">Réinitialiser</button>
+                </div>
+                <div id="pomodoro-sessions">Sessions complétées: <strong>0</strong></div>
+            </div>
+        </section>
+
+        <!-- Objectifs et Suivi -->
+        <section id="goals">
+            <h2>Objectifs et Suivi</h2>
+            <form id="goals-form">
+                <label for="goal-title">Objectif :</label>
+                <input id="goal-title" placeholder="Ex: Apprendre Python" required>
+                
+                <label for="goal-deadline">Délai :</label>
+                <input id="goal-deadline" type="date" required>
+                
+                <label for="goal-progress">Progression (%):</label>
+                <input id="goal-progress" type="range" min="0" max="100" value="0">
+                <span id="progress-value">0%</span>
+                
+                <button type="submit">Ajouter Objectif</button>
+            </form>
+            <div id="goals-list">
+                <h3>Mes Objectifs</h3>
+                <ul></ul>
+            </div>
+        </section>
+
+        <!-- Statistiques -->
+        <section id="stats">
+            <h2>Statistiques</h2>
+            <div id="stats-container">
+                <div class="stat-box">
+                    <h4>Devoirs en attente</h4>
+                    <p id="pending-hw">0</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Cours créés</h4>
+                    <p id="courses-count">0</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Objectifs complétés</h4>
+                    <p id="completed-goals">0</p>
+                </div>
+                <div class="stat-box">
+                    <h4>Temps d'étude total</h4>
+                    <p id="total-study-time">0h</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <footer>
+        <p>&copy; 2024 OrgaStudy. Tous droits réservés à elterkawy faress.</p>
+        <script src='https://cdn.jotfor.ms/agent/embedjs/019aa07e5eac70f9bc6f4b6732c94d309785/embed.js'></script>
+        <script src="OrgaStudy.js"></script>
+        <script src="daily-scheduler.js"></script>
+    </footer>
+</body>
+</html>

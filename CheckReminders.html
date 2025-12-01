@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>OrgaStudy — Vérification rappels (automatique)</title>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.emailjs.com/sdk/3.2/email.min.js"></script>
+
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin: 28px; color:#222; }
+    .ok { color: #2c9f4a; }
+    .warn { color: #f0ad4e; }
+    .err { color: #b92b2b; }
+    pre { background:#f7f7f7; padding:12px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <h1>OrgaStudy — Vérification rappels</h1>
+  <p>Cette page est prévue pour être appelée automatiquement (cron-job). Elle lit les tâches dans <code>localStorage</code> et envoie un email si nécessaire.</p>
+
+  <div id="log"></div>
+
+  <script>
+  (function () {
+    // ---------- CONFIGURATION (modifie ces valeurs si besoin) ----------
+    const EMAILJS_SERVICE_ID = "service_hzn000b";      // fourni
+    const EMAILJS_TEMPLATE_ID = "template_6h0ynkm";   // fourni
+    const EMAILJS_PUBLIC_KEY = "nZ29EFAfhQl4Sk20J";  // fourni
+    const STORAGE_KEY = "orga_homeworks";             // clef utilisée par ton site
+    const MIN_PRIORITY_FOR_ALERT = 12;                // seuil priorité "forte"
+    const SECRET_TOKEN = "s5ZdR9Q_h1v2Xx!";    // <= remplace avant usage !
+    // ------------------------------------------------------------------
+
+    const LOG = document.getElementById('log');
+    function log(msg, cls) {
+      const p = document.createElement('p');
+      if (cls) p.className = cls;
+      p.textContent = msg;
+      LOG.appendChild(p);
+      console.log(msg);
+    }
+
+    // Sécurité simple : vérifier le token dans l'URL
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token') || '';
+    if (!token || token !== SECRET_TOKEN) {
+      log('ERREUR: token manquant ou invalide. Accès refusé.', 'err');
+      // stop here
+      return;
+    }
+
+    // Initialiser EmailJS
+    try {
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+      log('EmailJS initialisé.', 'ok');
+    } catch (e) {
+      log('Erreur init EmailJS: ' + e.message, 'err');
+      return;
+    }
+
+    // Récupérer les tâches depuis localStorage
+    let itemsRaw = [];
+    try {
+      itemsRaw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch (e) {
+      log('Impossible de lire localStorage, format invalide. ' + e.message, 'err');
+      itemsRaw = [];
+    }
+
+    if (!Array.isArray(itemsRaw) || itemsRaw.length === 0) {
+      log('Aucune tâche trouvée dans localStorage (clef "' + STORAGE_KEY + '").', 'warn');
+      // On peut choisir d'envoyer ou non un mail quand il n'y a rien ; ici on ne fait rien.
+      return;
+    }
+
+    // Fonction utilitaires (mêmes règles que ton script principal)
+    function durationToScore(hours) {
+      const h = Number(hours) || 0;
+      if (h <= 1) return 1;
+      if (h <= 3) return 2;
+      if (h <= 5) return 3;
+      if (h <= 7) return 4;
+      return 5;
+    }
+    function dateToScore(dateStr) {
+      if (!dateStr) return 1;
+      const today = new Date(); today.setHours(0,0,0,0);
+      const due = new Date(dateStr); due.setHours(0,0,0,0);
+      const msPerDay = 24*60*60*1000;
+      const diffDays = Math.round((due - today) / msPerDay);
+      if (diffDays < 0) return 5;
+      if (diffDays <= 1) return 5;
+      if (diffDays <= 3) return 4;
+      if (diffDays <= 7) return 3;
+      if (diffDays <= 14) return 2;
+      return 1;
+    }
+    function computePriority(urgence, difficulte, duree, dateStr) {
+      const u = Number(urgence) || 1;
+      const d = Number(difficulte) || 1;
+      const ds = durationToScore(duree);
+      const dateS = dateToScore(dateStr);
+      const value = u + d + ds + dateS; // 4..20 environ
+      let label = 'Faible';
+      if (value >= 16) label = 'Très haute';
+      else if (value >= 12) label = 'Haute';
+      else if (value >= 8) label = 'Moyenne';
+      return { value, label };
+    }
+
+    // Normaliser les items et reconstruire priorité si nécessaire
+    const today = new Date(); today.setHours(0,0,0,0);
+    const overdue = [], todayList = [], highPriority = [];
+    const allItems = [];
+
+    itemsRaw.forEach(it => {
+      // champ attendu : sujet, date, desc, urgence, difficulte, duree (ton code stocke sous ces noms)
+      const sujet = it.sujet || it.Sujet || it.nom || 'Sans titre';
+      const date = it.date || it['date-limite'] || it.due || '';
+      const desc = it.desc || it.description || '';
+      const urgence = it.urgence || it.urgence === 0 ? it.urgence : (it.Urgence || 3);
+      const difficulte = it.difficulte || it.difficulte === 0 ? it.difficulte : (it.Difficulte || 3);
+      const duree = it.duree || it.duree === 0 ? it.duree : (it.Duree || 1);
+
+      const pr = computePriority(urgence, difficulte, duree, date);
+      const obj = { sujet, date, desc, urgence, difficulte, duree, priorityValue: pr.value, priorityLabel: pr.label };
+      allItems.push(obj);
+
+      // classification
+      if (date) {
+        const dueDate = new Date(date); dueDate.setHours(0,0,0,0);
+        const diffMs = dueDate - today;
+        const diffDays = Math.round(diffMs / (24*60*60*1000));
+        if (diffDays < 0) overdue.push(obj);
+        if (diffDays === 0) todayList.push(obj);
+      }
+      if (pr.value >= MIN_PRIORITY_FOR_ALERT) highPriority.push(obj);
+    });
+
+    // Trier les listes par priorité décroissante
+    const sortByPriorityDesc = (a,b) => Number(b.priorityValue) - Number(a.priorityValue);
+    overdue.sort(sortByPriorityDesc);
+    todayList.sort(sortByPriorityDesc);
+    highPriority.sort(sortByPriorityDesc);
+    allItems.sort(sortByPriorityDesc);
+
+    // Construire le message HTML / texte du mail
+    function formatItem(it) {
+      const d = it.date ? ` (échéance: ${it.date})` : '';
+      return `• ${it.sujet}${d} — Urgence:${it.urgence} · Difficulté:${it.difficulte} · Durée:${it.duree}h · Priorité:${it.priorityValue} (${it.priorityLabel})`;
+    }
+
+    let message = `<h2>Rappel OrgaStudy — ${new Date().toLocaleDateString('fr-FR')}</h2>`;
+    // inclure logo local (chemin sur le serveur) — le host doit rendre ce fichier accessible si tu veux le voir dans le mail.
+    message += `<div><img src="/mnt/data/A_flat_digital_vector_illustration_features_a_frie.png" alt="OrgaStudy logo" style="max-width:160px;"/></div>`;
+
+    if (overdue.length) {
+      message += `<h3 style="color:#b92b2b;">Devoirs en retard</h3><ul>`;
+      overdue.forEach(it => message += `<li>${escapeHtml(formatItem(it))}</li>`);
+      message += `</ul>`;
+    } else {
+      message += `<h3>Pas de devoirs en retard</h3>`;
+    }
+
+    if (todayList.length) {
+      message += `<h3 style="color:#2c9f4a;">Devoirs pour aujourd'hui</h3><ul>`;
+      todayList.forEach(it => message += `<li>${escapeHtml(formatItem(it))}</li>`);
+      message += `</ul>`;
+    } else {
+      message += `<h3>Aucun devoir à faire strictement aujourd'hui</h3>`;
+    }
+
+    if (highPriority.length) {
+      message += `<h3 style="color:#d9534f;">Devoirs très prioritaires</h3><ul>`;
+      highPriority.forEach(it => message += `<li>${escapeHtml(formatItem(it))}</li>`);
+      message += `</ul>`;
+    } else {
+      message += `<h3>Aucun devoir avec priorité très élevée</h3>`;
+    }
+
+    // Ajouter un résumé compact
+    message += `<h4>Résumé — ${allItems.length} devoir(s) total</h4><ul>`;
+    allItems.slice(0,12).forEach(it => message += `<li>${escapeHtml(formatItem(it))}</li>`);
+    message += `</ul>`;
+
+    // Helper pour échapper HTML (sécurité)
+    function escapeHtml(s = '') {
+      return String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+    }
+
+    // Destinataire : tu peux définir un champ par défaut ici
+    // OPTION: tu peux lire l'email destinataire depuis localStorage si tu l'as enregistré.
+    const defaultRecipient = localStorage.getItem('orga_user_email') || null;
+    if (!defaultRecipient) {
+      log('Alerte: aucun email destinataire trouvé dans localStorage (clef "orga_user_email"). Pour envoyer un mail, ajoute un email dans localStorage ou modifie le fichier.', 'warn');
+      // tu peux quand même forcer l'envoi en mettant un destinataire "test@exemple.com"
+      // return; // si tu veux bloquer l'envoi sans destinataire, décommente.
+    }
+
+    // Préparer le payload pour EmailJS
+    const templateParams = {
+      // selon ton template, on enverra la variable "message" ; modifie si ton template utilise un nom différent
+      message: message,
+      // si template attend "to_email", "to_name", etc. : ajoute-les
+      to_email: defaultRecipient || "eleve@example.com",
+      site_name: "OrgaStudy"
+    };
+
+    log('Préparation envoi email à : ' + (templateParams.to_email || '(aucun)'), 'ok');
+
+    // Envoyer via EmailJS
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+      .then(function(resp) {
+        log('Email envoyé avec succès. Status: ' + resp.status + ' ' + resp.text, 'ok');
+      }, function(err) {
+        log('Erreur envoi EmailJS: ' + JSON.stringify(err), 'err');
+      });
+
+  })();
+  </script>
+</body>
+</html>
