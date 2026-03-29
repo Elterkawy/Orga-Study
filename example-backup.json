@@ -1,0 +1,135 @@
+{
+  "version": "2.0.0",
+  "exportDate": "2026-02-10T14:30:00.000Z",
+  "homeworks": [
+    {
+      "id": "1707398400123a1b2c",
+      "sujet": "Devoir de Mathématiques - Algèbre",
+      "date": "2026-02-15",
+      "desc": "Résoudre les équations du chapitre 1-3, exercices 1-20",
+      "urgence": "4",
+      "difficulte": "3",
+      "duree": "2.5",
+      "priorityValue": 15,
+      "priorityLabel": "Haute"
+    },
+    {
+      "id": "1707398500234b2c3d",
+      "sujet": "Projet de Physique",
+      "date": "2026-02-20",
+      "desc": "Préparation du projet sur les ondes sonores",
+      "urgence": "3",
+      "difficulte": "4",
+      "duree": "5",
+      "priorityValue": 13,
+      "priorityLabel": "Haute"
+    },
+    {
+      "id": "1707398600345c3d4e",
+      "sujet": "Essai d'histoire",
+      "date": "2026-02-25",
+      "desc": "Écrire un essai sur la Révolution française (1000 mots minimum)",
+      "urgence": "2",
+      "difficulte": "3",
+      "duree": "3",
+      "priorityValue": 9,
+      "priorityLabel": "Moyenne"
+    }
+  ],
+  "finishedHomeworks": [
+    {
+      "id": "1707290000111a1a1a",
+      "sujet": "Quiz de Chimie",
+      "date": "2026-02-08",
+      "desc": "Quiz sur les réactions chimiques",
+      "urgence": "4",
+      "difficulte": "2",
+      "duree": "1",
+      "priorityValue": 10,
+      "priorityLabel": "Moyenne",
+      "completedAt": 1707290400000
+    }
+  ],
+  "schedule": {
+    "2026-02-10": [
+      {
+        "id": "1707398400456d4e5f",
+        "title": "Mathématiques",
+        "start": 14,
+        "end": 16
+      },
+      {
+        "id": "1707398400567e5f6g",
+        "title": "Français",
+        "start": 16,
+        "end": 17
+      }
+    ],
+    "2026-02-11": [
+      {
+        "id": "1707484800678f6g7h",
+        "title": "Physique - Projet",
+        "start": 15,
+        "end": 17
+      },
+      {
+        "id": "1707484800789g7h8i",
+        "title": "Pause",
+        "start": 17,
+        "end": 18
+      },
+      {
+        "id": "1707484800890h8i9j",
+        "title": "Sciences",
+        "start": 18,
+        "end": 19
+      }
+    ]
+  },
+  "courses": [
+    {
+      "id": "1707398400901i9j0k",
+      "title": "Algèbre Linéaire - Chapitre 1",
+      "content": "<h2>Équations Linéaires</h2><p>Une équation linéaire est une équation de la forme ax + b = c où a, b, c sont des constantes.</p><h3>Exemples:</h3><ul><li>2x + 3 = 7</li><li>5x - 2 = 13</li></ul><p>Pour résoudre: isoler la variable x en utilisant les propriétés de l'égalité.</p>",
+      "created": 1707398400000,
+      "updated": 1707398400000
+    },
+    {
+      "id": "1707398401012j0k1l",
+      "title": "Histoire - La Révolution Française",
+      "content": "<h2>Background Historique</h2><p>La Révolution française commence en 1789...</p><h3>Causes:</h3><ol><li>Crise économique</li><li>Mauvais gouvernement</li><li>Lumières philosophiques</li></ol>",
+      "created": 1707398401000,
+      "updated": 1707398401000
+    },
+    {
+      "id": "1707398402123k1l2m",
+      "title": "Notes vides - À compléter",
+      "content": "",
+      "created": 1707398402000,
+      "updated": 1707398402000
+    }
+  ],
+  "goals": [
+    {
+      "id": "1707398403234l2m3n",
+      "title": "Apprendre Python",
+      "deadline": "2026-06-30",
+      "progress": 45,
+      "created": 1707398403000
+    },
+    {
+      "id": "1707398404345m3n4o",
+      "title": "Lire un livre par mois",
+      "deadline": "2026-12-31",
+      "progress": 100,
+      "created": 1707398404000
+    },
+    {
+      "id": "1707398405456n4o5p",
+      "title": "Améliorer ma note en Maths",
+      "deadline": "2026-05-15",
+      "progress": 60,
+      "created": 1707398405000
+    }
+  ]
+}

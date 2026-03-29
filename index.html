@@ -5,8 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OrgaStudy - Organization and Study Tips</title>
     <link rel="stylesheet" href="OrgaStudy.css">
+    <link rel="stylesheet" href="header.css">
     <link rel="stylesheet" href="daily-scheduler.css">
-    <link rel="icon" href="CheckReminders.html">
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- partie application -->
+     <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4A90E2">
+<link rel="apple-touch-icon" href="assets/img/logo.png">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker enregistré avec succès'))
+        .catch(err => console.error('Erreur lors de l\'enregistrement du Service Worker:', err));
+    });
+  }
+</script>
+<!-- fin Partie application -->
 </head>
 <body>
     <header>
@@ -25,7 +42,7 @@
             </ul>
         </nav>
     </header>
-    <main>
+    <main> 
         <section id="presentation">
             <h2>Bienvenue sur OrgaStudy</h2>
             <p>Votre ressource ultime pour l'organisation et les conseils d'étude.</p>
@@ -90,16 +107,19 @@
         </section>
 
         <section id="cours">
-            <h2>Cours</h2>
+            <h2>📚 Mes Cours - Espace de Travail</h2>
             <form id="course-form">
-                <label for="course-title">Titre du cours :</label>
-                <input id="course-title" name="title" required>
+                <label for="course-title">📖 Titre du cours:</label>
+                <input id="course-title" name="title" placeholder="Ex: Mathématiques - Algèbre" required>
 
-                <label for="course-content">Contenu (texte libre) :</label>
-                <textarea id="course-content" name="content" rows="8" placeholder="Écrivez vos cours ici..."></textarea>
+                <label for="course-content">✍️ Contenu (notes, formules, exercices):</label>
+                <textarea id="course-content" name="content" rows="10" placeholder="Écrivez vos notes, formules, exercices ou résumés ici..."></textarea>
 
                 <input type="hidden" id="course-id" value="">
-                <button type="submit">Enregistrer le cours</button>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button type="submit" style="flex:1">💾 Enregistrer le cours</button>
+                    <button type="button" id="open-course-editor" style="flex:1">📝 Ouvrir l'éditeur complet</button>
+                </div>
             </form>
 
             <div id="course-list">
@@ -112,6 +132,7 @@
                 <div id="view-content"></div>
                 <div style="margin-top:8px">
                     <button id="edit-course">Éditer</button>
+                    <button id="open-in-editor">Ouvrir dans l'éditeur</button>
                     <button id="open-course-newtab">Ouvrir dans un nouvel onglet</button>
                     <button id="delete-course">Supprimer</button>
                     <button id="close-course-view">Fermer</button>
@@ -122,14 +143,40 @@
         <section id="tools">
             <h2>Outils d'organisation</h2>
 
-            <!-- Chronomètre -->
+            <!-- Chronomètre amélioré -->
             <div id="timer" class="tool-box">
                 <h3>Chronomètre</h3>
-                <div>
-                    <span id="timer-display">00:00:00</span>
-                    <button id="start-timer">Démarrer</button>
-                    <button id="stop-timer">Arrêter</button>
-                    <button id="reset-timer">Réinitialiser</button>
+                <div id="enhanced-timer" class="enhanced-timer">
+                    <div class="timer-left">
+                        <svg class="timer-ring" width="120" height="120" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="50" stroke="#e6e6e6" stroke-width="10" fill="none"></circle>
+                            <circle id="timer-ring-circle" cx="60" cy="60" r="50" stroke="#6366F1" stroke-width="10" fill="none" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="314" stroke-dashoffset="314"></circle>
+                        </svg>
+                    </div>
+                    <div class="timer-right">
+                        <div class="timer-display-wrap">
+                            <div id="timer-display" class="timer-display">00:00:00</div>
+                            <div class="timer-mode">
+                                <label><input type="radio" name="timer-mode" value="stopwatch" checked> Chrono</label>
+                                <label><input type="radio" name="timer-mode" value="countdown"> Minuteur</label>
+                            </div>
+                        </div>
+
+                        <div class="timer-controls">
+                            <input id="countdown-minutes" type="number" min="1" value="25" title="Minutes pour le minuteur" />
+                            <div class="controls-row">
+                                <button id="start-timer">Démarrer</button>
+                                <button id="stop-timer">Pause</button>
+                                <button id="reset-timer">Réinitialiser</button>
+                                <button id="timer-lap">Tour</button>
+                            </div>
+                        </div>
+
+                        <div class="laps">
+                            <h4>Tours</h4>
+                            <ul id="laps-list"></ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -149,37 +196,53 @@
 
             
 <!-- Calculatrice -->
+
 <div id="calculator" class="tool-box">
     <h3>Calculatrice</h3>
     <div class="calculator-container">
+            <div class="calc-fn-row" style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;justify-content:center">
+                <button class="calc-btn calc-fn" data-value="^">^</button>
+                <button class="calc-btn calc-fn" data-value="%">%</button>
+                <button class="calc-btn calc-fn" data-value="sqrt(">sqrt</button>
+                <button class="calc-btn calc-fn" data-value="sin(">sin</button>
+                <button class="calc-btn calc-fn" data-value="cos(">cos</button>
+                <button class="calc-btn calc-fn" data-value="tan(">tan</button>
+                <button class="calc-btn calc-fn" data-value="ln(">ln</button>
+                <button id="calc-mode-toggle" class="calc-btn calc-fn" data-value="mode">RAD</button>
+                <button id="calc-help" class="calc-btn calc-fn" data-value="help">?</button>
+            </div>
         <div class="calc-display">
             <input type="text" id="calc-input" placeholder="0" readonly />
+            <span id="calc-mode-label" class="calc-mode-indicator" style="margin-left:8px">RAD</span>
         </div>
         <div class="calc-grid">
             <button class="calc-btn calc-clear" data-value="C">C</button>
-            <button class="calc-btn calc-operator" data-value="/">/</button>
-            <button class="calc-btn calc-operator" data-value="*">×</button>
+            <button class="calc-btn calc-operator" data-value="÷">÷</button>
+            <button class="calc-btn calc-operator" data-value="×">×</button>
             <button class="calc-btn calc-operator" data-value="-">−</button>
-            
+
             <button class="calc-btn calc-number" data-value="7">7</button>
             <button class="calc-btn calc-number" data-value="8">8</button>
             <button class="calc-btn calc-number" data-value="9">9</button>
             <button class="calc-btn calc-operator" data-value="+">+</button>
-            
+
             <button class="calc-btn calc-number" data-value="4">4</button>
             <button class="calc-btn calc-number" data-value="5">5</button>
             <button class="calc-btn calc-number" data-value="6">6</button>
             <button class="calc-btn calc-decimal" data-value=".">.</button>
-            
+
             <button class="calc-btn calc-number" data-value="1">1</button>
             <button class="calc-btn calc-number" data-value="2">2</button>
             <button class="calc-btn calc-number" data-value="3">3</button>
             <button class="calc-btn calc-equals" id="calc-equal" data-value="=">=</button>
-            
+
             <button class="calc-btn calc-zero" data-value="0">0</button>
+            <button class="calc-btn calc-fn" data-value="(">(</button>
+            <button class="calc-btn calc-fn" data-value=")">)</button>
         </div>
     </div>
 </div>
+<!-- ...existing code... -->
 
         <!-- Pomodoro Technique -->
         <section id="pomodoro">
@@ -244,6 +307,8 @@
     <footer>
         <p>&copy; 2024 OrgaStudy. Tous droits réservés à elterkawy faress.</p>
         <script src='https://cdn.jotfor.ms/agent/embedjs/019aa07e5eac70f9bc6f4b6732c94d309785/embed.js'></script>
+        <script>window.USE_BACKEND = true;</script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.min.js"></script>
         <script src="OrgaStudy.js"></script>
         <script src="daily-scheduler.js"></script>
     </footer>

@@ -227,3 +227,122 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+/* ============ CALCULATRICE ============ */
+.calculator-container {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    border-radius: 12px;
+    padding: 15px;
+    max-width: 320px;
+    margin: 0 auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.calc-display {
+    margin-bottom: 15px;
+}
+
+#calc-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: right;
+    background-color: #ecf0f1;
+    border: none;
+    border-radius: 8px;
+    color: #2c3e50;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.calc-btn {
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.calc-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+}
+
+.calc-number {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+.calc-number:hover {
+    background-color: #d5dbdb;
+}
+
+.calc-operator {
+    background-color: #e67e22;
+    color: white;
+    font-size: 20px;
+}
+
+.calc-operator:hover {
+    background-color: #d35400;
+}
+
+.calc-decimal {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+.calc-decimal:hover {
+    background-color: #d5dbdb;
+}
+
+.calc-equals {
+    background: linear-gradient(135deg, #27ae60, #229954);
+    color: white;
+    font-size: 22px;
+    grid-column: span 1;
+}
+
+.calc-equals:hover {
+    background: linear-gradient(135deg, #229954, #1e8449);
+}
+
+.calc-clear {
+    background-color: #e74c3c;
+    color: white;
+    grid-column: span 1;
+    font-weight: bold;
+}
+
+.calc-clear:hover {
+    background-color: #c0392b;
+}
+
+.calc-zero {
+    grid-column: span 2;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+.calc-zero:hover {
+    background-color: #d5dbdb;
+}
