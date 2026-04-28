@@ -1,34 +1,3 @@
-/**
- * OrgaStudy - Main Application Logic
- * 
- * A comprehensive organization and study management application with:
- * - Homework management with automatic prioritization
- * - Interactive calendar with daily events
- * - Daily scheduler with time blocks
- * - Course notes management
- * - Goals tracking with progress bars
- * - Advanced tools: Timer, Pomodoro, Scientific Calculator, Notes
- * - Offline support via Service Worker
- * - Local and optional SQLite backend storage
- * 
- * Version: 2.0.0
- * Last Updated: 2026-02-10
- * 
- * Improvements in v2.0:
- * ✅ Enhanced error handling with try-catch blocks
- * ✅ Comprehensive input validation across all forms
- * ✅ Better HTML escaping using textContent
- * ✅ Improved null/undefined safety checks
- * ✅ Better API error fallbacks to localStorage
- * ✅ Enhanced date validation (prevent past dates)
- * ✅ Better error messages for users
- * ✅ Strict bounds checking in edit functions
- * 
- * Storage:
- * - localStorage: Local browser storage (primary)
- * - SQLite (optional): Backend storage if Node.js server is running
- * - Service Worker: Offline caching of assets
- */
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('devoires-form');
@@ -45,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let goals = [];
     let doneItems = [];
 
-    // Helper functions with improved error handling
+    
     function escapeHtml(s = '') {
         if (typeof s !== 'string') s = String(s || '');
         const div = document.createElement('div');
@@ -64,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Persist helper: save locally and optionally push to backend
+    
     function keyToApiPath(key) {
         if (key === STORAGE_KEY) return '/api/homeworks';
         if (key === SCHEDULE_KEY) return '/api/schedule';
@@ -97,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // API helper that chooses a proper base when the file is opened via file://
+    
     const API_BASE = window.API_BASE || (location.protocol === 'file:' ? 'http://localhost:3000' : '');
     function apiFetch(path, opts) {
         try {
@@ -902,9 +871,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ============ DATABASE MANAGEMENT ============
-    /**
-     * Exporte toutes les données en fichier JSON
-     */
+   
     function exportDatabase() {
         try {
             const allData = {
@@ -1041,8 +1008,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return stats;
     }
 
-    // Ajouter les événements pour les boutons de gestion de BD
-    // (Ces boutons seront ajoutés à l'interface si nécessaire)
+ 
     window.exportDatabase = exportDatabase;
     window.importDatabase = importDatabase;
     window.clearAllData = clearAllData;
